@@ -19,11 +19,11 @@ RTC_DATA_ATTR static int vector_rtc_static[VECTOR_SIZE] = {1,2,3,4,5,6,7,8,9,10,
 RTC_DATA_ATTR static int num_rtc_static = 5;
 RTC_DATA_ATTR static int result_rtc_static[VECTOR_SIZE];
 
-/* Este no se si es estático pero asi salia en el enunciado */
+/* Este no se si es estático pero aqui salia escrito en el enunciado */
 // FLASH (Read only)
 const __attribute__((section(".rodata"))) int vector_flash_ext[VECTOR_SIZE] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
 const __attribute__((section(".rodata"))) int num_flash = 5;
-// result_flash va a estar abajo porque no puede ser un result only
+// result_flash va a estar abajo porque no puede ser un read only
 
 // Funcion que sale en el enunciado
 void multiply_vector_scalar(volatile int *vector, volatile int *result, int num, int size) {
@@ -45,6 +45,9 @@ void test_memory(const char *name, volatile int *vector, volatile int *result, i
 }
 
 void app_main() {
+    /* Este se usa para el FLASH de arriba */
+    int result_flash[VECTOR_SIZE];
+    
     /* Memorias dinamicas */
     int *vector_dram_dynamic = (int*)malloc(VECTOR_SIZE * sizeof(int));
     int *result_dram_dynamic = (int*)malloc(VECTOR_SIZE * sizeof(int));
@@ -66,14 +69,13 @@ void app_main() {
         // vector_psram_dynamic[i] = i + 1;
     }
 
+    // Esta se repite solo porque la primera siempre estaba saliendo más lenta
+    test_memory("IRAM static (Solo por tiempo lento al inicio)", vector_iram_static, result_iram_static, num_iram_static);
     // Tests
     test_memory("DRAM static", vector_dram_static, result_dram_static, num_dram_static);
     test_memory("IRAM static", vector_iram_static, result_iram_static, num_iram_static);
     test_memory("RTC static", vector_rtc_static, result_rtc_static, num_rtc_static);
-
-    int result_flash[VECTOR_SIZE];
     test_memory("FLASH (.rodata)", (int*)vector_flash_ext, result_flash, num_flash);
-
     test_memory("DRAM dynamic", vector_dram_dynamic, result_dram_dynamic, num_dram_dynamic);
     test_memory("IRAM dynamic", vector_iram_dynamic, result_iram_dynamic, num_iram_dynamic);
     // test_memory("PSRAM dynamic", vector_psram_dynamic, result_psram_dynamic, num_psram_dynamic);
