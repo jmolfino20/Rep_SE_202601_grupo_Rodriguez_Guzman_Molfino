@@ -40,8 +40,9 @@ void test_memory(const char *name, volatile int *vector, volatile int *result, i
 
     uint32_t cycles = end - start;
     float cycles_per_byte = (float)cycles / (VECTOR_SIZE * sizeof(int));
+    int memory_size = (VECTOR_SIZE * sizeof(int));
 
-    printf("%s: %lu cycles, %.4f cycles/byte\n", name, (unsigned long)cycles, cycles_per_byte);
+    printf("%s: %lu cycles, %.4f cycles/byte, %i bytes\n", name, (unsigned long)cycles, cycles_per_byte, memory_size);
 }
 
 void app_main() {
