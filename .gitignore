@@ -1,6 +1,9 @@
 build/
 **/build/
 
+managed_components/
+**/managed_components/
+
 sdkconfig.old
 
 *.bin
