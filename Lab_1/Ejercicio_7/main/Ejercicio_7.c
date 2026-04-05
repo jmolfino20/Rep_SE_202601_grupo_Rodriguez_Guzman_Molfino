@@ -162,8 +162,8 @@ void app_main(void)
         for (int i = 0; i < pic->len; i++) {
             printf("0x%02X, ", pic->buf[i]);
 
-            // Opcional: salto de línea cada cierto número de bytes
-            if ((i + 1) % 16 == 0) {
+            // salto de línea cada cierto número de bytes
+            if ((i + 1) % 24 == 0) {
                 printf("\n");
             }
         }
