@@ -138,6 +138,41 @@ static void maybe_init_autofocus(void)
 #endif
 #endif
 
+void histogram_equalization(uint8_t *image, size_t len) {
+    int hist[256] = {0};
+    float cdf[256] = {0};
+    uint8_t lut[256];
+
+    // Histograma
+    for (int i = 0; i < len; i++) {
+        hist[image[i]]++;
+    }
+
+    // Calcular la funcion acumulada
+    cdf[0] = hist[0];
+    for (int i = 1; i < 256; i++) {
+        cdf[i] = cdf[i - 1] + hist[i];
+    }
+
+    // Normalización
+    float cdf_min = 0;
+    for (int i = 0; i < 256; i++) {
+        if (cdf[i] != 0) {
+            cdf_min = cdf[i];
+            break;
+        }
+    }
+
+    for (int i = 0; i < 256; i++) {
+        lut[i] = (uint8_t)(((cdf[i] - cdf_min) / (len - cdf_min)) * 255.0);
+    }
+
+    // Transformar
+    for (int i = 0; i < len; i++) {
+        image[i] = lut[image[i]];
+    }
+}
+
 void app_main(void)
 {
 #if ESP_CAMERA_SUPPORTED
@@ -158,6 +193,24 @@ void app_main(void)
             ESP_LOGE(TAG, "Error al capturar la imagen");
             continue;
         }
+
+        printf("Foto normal\n");
+
+        for (int i = 0; i < pic->len; i++) {
+            printf("0x%02X, ", pic->buf[i]);
+
+            // salto de línea cada cierto número de bytes
+            if ((i + 1) % 24 == 0) {
+                printf("\n");
+            }
+        }
+
+        // Con la foto tomada se calcula el histograma
+        histogram_equalization(pic->buf, pic->len);
+
+        vTaskDelay(pdMS_TO_TICKS(10));  // Pa que no llore el watchdog
+
+        printf("\nFoto ecualizada\n");
 
         for (int i = 0; i < pic->len; i++) {
             printf("0x%02X, ", pic->buf[i]);
