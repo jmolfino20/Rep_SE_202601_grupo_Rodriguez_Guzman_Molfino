@@ -7,15 +7,15 @@
 
 /* Memorias estaticas */
 // DRAM estatica
-DRAM_ATTR static int vector_dram_static[VECTOR_SIZE] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+DRAM_ATTR static int vector_dram_static[VECTOR_SIZE];
 DRAM_ATTR static int num_dram_static = 5;
 DRAM_ATTR static int result_dram_static[VECTOR_SIZE];
 // IRAM estatica
-IRAM_ATTR static int vector_iram_static[VECTOR_SIZE] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+IRAM_ATTR static int vector_iram_static[VECTOR_SIZE];
 IRAM_ATTR static int num_iram_static = 5;
 IRAM_ATTR static int result_iram_static[VECTOR_SIZE];
 // RTC estatica
-RTC_DATA_ATTR static int vector_rtc_static[VECTOR_SIZE] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+RTC_DATA_ATTR static int vector_rtc_static[VECTOR_SIZE];
 RTC_DATA_ATTR static int num_rtc_static = 5;
 RTC_DATA_ATTR static int result_rtc_static[VECTOR_SIZE];
 
@@ -58,26 +58,30 @@ void app_main() {
     int *result_iram_dynamic = (int*)heap_caps_malloc(VECTOR_SIZE * sizeof(int), MALLOC_CAP_EXEC);
     int num_iram_dynamic = 5;
 
-    // Mi ESP32 chino no tenía PSRAM, probemos con el del lab
-    // int *vector_psram_dynamic = heap_caps_malloc(VECTOR_SIZE * sizeof(int), MALLOC_CAP_SPIRAM);
-    // int *result_psram_dynamic = heap_caps_malloc(VECTOR_SIZE * sizeof(int), MALLOC_CAP_SPIRAM);
-    // int num_psram_dynamic = 5;
+    // Con el ESP32-S3 del lab no está funcionando.
+    // El ESP32-S3 de otros grupos (que no son N16R8) si funciona, y el que tenía yo (N16R8) También
+    int *vector_psram_dynamic = heap_caps_malloc(VECTOR_SIZE * sizeof(int), MALLOC_CAP_SPIRAM);
+    int *result_psram_dynamic = heap_caps_malloc(VECTOR_SIZE * sizeof(int), MALLOC_CAP_SPIRAM);
+    int num_psram_dynamic = 5;
 
-    // Inicializar los valores de las dinamicas
+    // Inicializar los valores de las memorias
     for (int i = 0; i < VECTOR_SIZE; i++) {
+        vector_dram_static[i] = i + 1;
+        vector_iram_static[i] = i + 1;
+        vector_rtc_static[i]  = i + 1;
         vector_dram_dynamic[i] = i + 1;
         vector_iram_dynamic[i] = i + 1;
-        // vector_psram_dynamic[i] = i + 1;
+        vector_psram_dynamic[i] = i + 1;
     }
 
     // Esta se repite solo porque la primera siempre estaba saliendo más lenta
     test_memory("IRAM static (Solo por tiempo lento al inicio)", vector_iram_static, result_iram_static, num_iram_static);
-    // Tests
+    // Tests (Estos si cuentan)
     test_memory("DRAM static", vector_dram_static, result_dram_static, num_dram_static);
     test_memory("IRAM static", vector_iram_static, result_iram_static, num_iram_static);
     test_memory("RTC static", vector_rtc_static, result_rtc_static, num_rtc_static);
     test_memory("FLASH (.rodata)", (int*)vector_flash_ext, result_flash, num_flash);
     test_memory("DRAM dynamic", vector_dram_dynamic, result_dram_dynamic, num_dram_dynamic);
     test_memory("IRAM dynamic", vector_iram_dynamic, result_iram_dynamic, num_iram_dynamic);
-    // test_memory("PSRAM dynamic", vector_psram_dynamic, result_psram_dynamic, num_psram_dynamic);
+    test_memory("PSRAM dynamic", vector_psram_dynamic, result_psram_dynamic, num_psram_dynamic);
 }
