@@ -3,7 +3,7 @@
 #include "esp_heap_caps.h"
 #include "esp_cpu.h"
 
-#define VECTOR_SIZE 20  // Esto es para hacerlo como sale en el enunciado, todos son size=20
+#define VECTOR_SIZE 20
 
 /* Memorias estaticas */
 // DRAM estatica
@@ -21,7 +21,9 @@ RTC_DATA_ATTR static int result_rtc_static[VECTOR_SIZE];
 
 /* Este no se si es estático pero aqui salia escrito en el enunciado */
 // FLASH (Read only)
-const __attribute__((section(".rodata"))) int vector_flash_ext[VECTOR_SIZE] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+const __attribute__((section(".rodata"))) int vector_flash_ext[VECTOR_SIZE] = {
+    1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+};
 const __attribute__((section(".rodata"))) int num_flash = 5;
 // result_flash va a estar abajo porque no puede ser un read only
 
