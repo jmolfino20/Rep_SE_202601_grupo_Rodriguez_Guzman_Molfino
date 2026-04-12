@@ -29,7 +29,7 @@ El código es, básicamente, la implementación base del ejemplo que entrega ESP
 
 *(El output no está completo para no mostrar todos los pixeles)
 
-Para poder ver la imágen, hay que copiar los valores entregados en el código y pegarlos en el notebook entregado por el profesor en el enunciado, que también está en [este archivo `.ipynb`](./SE_L1_E7.ipynb). Una vez cambiando los valores y ejecutando el notebook, podemos ver la foto. Aquí hay un ejemplo de un multímetro capturado con el ESP-CAM:
+Para poder ver la imágen, hay que copiar los valores entregados en el código y pegarlos en el notebook entregado por el profesor en el enunciado, que también está en [este archivo `.ipynb`](./SE_L1_E7.ipynb) (o [este Colab](https://colab.research.google.com/drive/1mn2NfLpON0XtHSGP5-V0_uuWvwm65_hk?usp=sharing)). Una vez cambiando los valores y ejecutando el notebook, podemos ver la foto. Aquí hay un ejemplo de un multímetro capturado con el ESP-CAM:
 
 <p align="center">
   <img src="./multimetro.png" width="40%"/>
