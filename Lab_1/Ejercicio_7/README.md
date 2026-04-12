@@ -1,5 +1,7 @@
 # Ejercicio 7
 
+[Ejercicio 6](../Ejercicio_6/README.md) - [Volver](../README.md) - [Ejercicio 8](../Ejercicio_8/README.md)
+
 ## Introducción
 
 Este ejercicio busca implementar el ejemplo que trae **ESP-IDF** para usar la cámara del **ESP-CAM**, haciendo ligeras modificaciones para entender mejor el código y que imprima la foto en Hex para luego pasarlo por un código en Python y mostrar la imagen reconstruída. 
