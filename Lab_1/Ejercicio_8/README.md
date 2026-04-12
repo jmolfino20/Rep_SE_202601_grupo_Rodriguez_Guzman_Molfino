@@ -1,8 +1,8 @@
-# Ejercicio 1
+# Ejercicio 7
 
 ## Introducción
 
-...
+Este ejercicio busca enseñar para qué sirve aplicar una ecualización de histograma a una imagen con baja resolución. 
 
 ## Ejecución
 
@@ -18,3 +18,31 @@ Una vez flasheado, podemos monitorear el MCU y verificar su funcionamiento. Para
 ```bash
 idf.py monitor ${RUTA-AL-COM}
 ```
+
+## Funcionamiento
+
+El código es, básicamente, la implementación del [Ejercicio_7](../Ejercicio_7/). Luego se editó ligeramente el código, agregando la función `histogram_equalization` que aplica la ecualización de histograma, por lo que se toma una imágen, se imprime, luego se aplica la ecualización y se vuelve a imprimir.
+
+La función `histogram_equalization` hace lo siguiente:
+- Recorre cada pixel, contando cuántas veces aparece cada valor de intensidad.
+- Calcula la función de distribución acumulada para cada valor.
+- Busca el primer valor no nulo (para evitar un error al ser una función acumulada).
+- Aplica la normalización/ecualización.
+
+Para poder ver las imagenes, hay que copiar los valores entregados en el código y pegarlos en el notebook que está en [este archivo `.ipynb`](./SE_L1_E8.ipynb) (o [este Colab](https://colab.research.google.com/drive/1DVBo-bludD95TED5lf7KmqXGEHkcwxAT?usp=sharing)). Una vez cambiando los valores y ejecutando el notebook, podemos ver la foto. Aquí hay un ejemplo de un multímetro capturado con el ESP-CAM antes y después de aplicar la equalización de histograma:
+
+<p align="center">
+  <img src="./out_normal.png" width="35%"/>
+  <img src="./out_eq.png" width="35%"/>
+</p>
+
+Además podemos ver los histogramas en los siguientes gráficos para ver cómo cambia entre el original y el ecualizado, para ver cómo se normaliza todo:
+
+<p align="center">
+  <img src="./hist_normal.png" width="35%"/>
+  <img src="./hist_eq.png" width="35%"/>
+</p>
+
+## Aprendizajes
+
+Este ejercicio muestra cómo obtener más información de una imágen de poca calidad usando la ecualización de histograma para aumentar el contraste.
