@@ -1,5 +1,7 @@
 # Ejercicio 7
 
+[Ejercicio 6](../Ejercicio_6/README.md) - [Volver](../README.md)
+
 ## Introducción
 
 Este ejercicio busca enseñar para qué sirve aplicar una ecualización de histograma a una imagen con baja resolución. 

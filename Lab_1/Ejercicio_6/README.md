@@ -1,5 +1,7 @@
 # Ejercicio 6
 
+[Ejercicio 5](../Ejercicio_5/README.md) - [Volver](../README.md) - [Ejercicio 7](../Ejercicio_7/README.md)
+
 ## Introducción
 
 En este ejercicio se utiliza la cámara del módulo ESP32-CAM junto con el entorno Arduino IDE para capturar una imagen. Se emplea un ejemplo predefinido del framework de Arduino que permite verificar rápidamente el funcionamiento correcto de la cámara.
