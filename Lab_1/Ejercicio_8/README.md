@@ -26,6 +26,7 @@ idf.py monitor ${RUTA-AL-COM}
 El código es, básicamente, la implementación del [Ejercicio_7](../Ejercicio_7/). Luego se editó ligeramente el código, agregando la función `histogram_equalization` que aplica la ecualización de histograma, por lo que se toma una imágen, se imprime, luego se aplica la ecualización y se vuelve a imprimir.
 
 La función `histogram_equalization` hace lo siguiente:
+
 - Recorre cada pixel, contando cuántas veces aparece cada valor de intensidad.
 - Calcula la función de distribución acumulada para cada valor.
 - Busca el primer valor no nulo (para evitar un error al ser una función acumulada).
