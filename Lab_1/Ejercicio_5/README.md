@@ -60,6 +60,8 @@ Para este ejemplo se usó la siguiente tabla de _Pinout_:
 
 ![Video de prueba](./ej_5_test.mp4)
 
+(También agregar el espectrograma del audio capturado)
+
 ## Análisis
 
 (Falta probar cambiar resolución y esas cosas pa poner un análisis)
