@@ -32,11 +32,16 @@ La función `histogram_equalization` hace lo siguiente:
 - Busca el primer valor no nulo (para evitar un error al ser una función acumulada).
 - Aplica la normalización/ecualización.
 
-Para poder ver las imagenes, hay que copiar los valores entregados en el código y pegarlos en el notebook que está en [este archivo `.ipynb`](./SE_L1_E8.ipynb) (o [este Colab](https://colab.research.google.com/drive/1DVBo-bludD95TED5lf7KmqXGEHkcwxAT?usp=sharing)). Una vez cambiando los valores y ejecutando el notebook, podemos ver la foto. Aquí hay un ejemplo de un multímetro capturado con el ESP-CAM antes y después de aplicar la equalización de histograma:
+Para poder ver las imagenes, hay que copiar los valores entregados en el código y pegarlos en el notebook que está en [este archivo `.ipynb`](./SE_L1_E8.ipynb) (o [este Colab](https://colab.research.google.com/drive/1DVBo-bludD95TED5lf7KmqXGEHkcwxAT?usp=sharing)). Una vez cambiando los valores y ejecutando el notebook, podemos ver la foto. Aquí hay un ejemplos de un multímetro y del grupo capturados con el ESP-CAM antes y después de aplicar la equalización de histograma:
 
 <p align="center">
   <img src="./out_normal.png" width="35%"/>
   <img src="./out_eq.png" width="35%"/>
+</p>
+
+<p align="center">
+  <img src="./grupo_normal.jpeg" width="35%"/>
+  <img src="./grupo_eq.jpeg" width="35%"/>
 </p>
 
 Además podemos ver los histogramas en los siguientes gráficos para ver cómo cambia entre el original y el ecualizado, para ver cómo se normaliza todo:
@@ -44,6 +49,11 @@ Además podemos ver los histogramas en los siguientes gráficos para ver cómo c
 <p align="center">
   <img src="./hist_normal.png" width="35%"/>
   <img src="./hist_eq.png" width="35%"/>
+</p>
+
+<p align="center">
+  <img src="./hist_grupo_normal.jpeg" width="35%"/>
+  <img src="./hist_grupo_eq.jpeg" width="35%"/>
 </p>
 
 ## Aprendizajes
