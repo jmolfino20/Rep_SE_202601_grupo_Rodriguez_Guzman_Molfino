@@ -7,7 +7,7 @@
 
 // Tamaño de FFT
 // (128, 256, 512, 1024)
-#define FFT_SIZE 512
+#define FFT_SIZE 1024
 
 // Resolución ADC
 // (ADC_BITWIDTH_9, ADC_BITWIDTH_10, ADC_BITWIDTH_11, ADC_BITWIDTH_12)

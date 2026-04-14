@@ -8,6 +8,7 @@
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include <time.h>
 
 
 static float real_fs = SAMPLE_RATE;
@@ -25,14 +26,31 @@ void app_main() {
     adc_audio_sample(signal);
     int64_t end = esp_timer_get_time();
     real_fs = FFT_SIZE / ((end - start) / 1e6);
+    printf("FS:%f\n", real_fs);
     
     while (1) {
-        vTaskDelay(1);   // Hay que hacer que a veces se ceda la tarea porque sino estaba dando un error
 
+        vTaskDelay(1);   // Hay que hacer que a veces se ceda la tarea porque sino estaba dando un error
+       // time_t start = esp_timer_get_time();
         adc_audio_sample(signal);
 
         fft_compute(signal, spectrum);
+        
+
+        // Descomentar para graficar
+        static int printed = 0;
+
+        if (!printed) {
+            for (int i = 0; i < FFT_SIZE/2; i++) {
+                printf("%f\n", spectrum[i]);
+            }
+            printf("END\n");
+            printed = 1;
+        }
+
         float freq = fft_find_peak(spectrum, real_fs);
+      // time_t end = esp_timer_get_time();
+      // printf("Time: %f ms\n", (end - start) / 1e3);
 
         ESP_LOGI("MAIN", "Freq: %.2f Hz", freq);   // Se imprime en consola
 

@@ -38,3 +38,23 @@ void adc_audio_sample(float *buffer) {
         esp_rom_delay_us((uint32_t)SAMPLE_PERIOD_US);        // se hace un delay segun la frecuencia de muestreo
     }
 }
+
+
+// void adc_audio_sample(float *buffer) {
+//     int raw;
+
+//     for (int i = 0; i < FFT_SIZE; i++) {
+//         adc_oneshot_read(adc_handle, ADC_CHANNEL, &raw);  
+
+//         // Reducir de 12 bits a 9 bits
+//         raw = raw >> 3;   // 4096 → 512 niveles
+
+//         // Offset correcto para 9 bits
+//         float offset = 512.0 / 2.0;   // = 256
+
+//         // Centrar señal
+//         buffer[i] = (float)raw - offset;
+
+//         esp_rom_delay_us((uint32_t)SAMPLE_PERIOD_US);
+//     }
+// }
