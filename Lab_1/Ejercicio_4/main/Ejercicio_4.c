@@ -28,23 +28,31 @@ const __attribute__((section(".rodata"))) int num_flash = 5;
 // result_flash va a estar abajo porque no puede ser un read only
 
 // Funcion que sale en el enunciado
-void multiply_vector_scalar(volatile int *vector, volatile int *result, int num, int size) {
+void multiply_vector_scalar(volatile int *vector, volatile int *result, int num, int size, int offset) {
     for (int i = 0; i < size; i++) {
-        result[i] = vector[i] * num;
+        int idx = (i + offset) % size; // esto elimina el cache 
+        result[i] = vector[idx] * num;
     }
 }
 
 // Para no hacer el for que sale, se hace esta funcion y se repite en todas las memorias
-void test_memory(const char *name, volatile int *vector, volatile int *result, int num) {
-    uint32_t start = esp_cpu_get_cycle_count();
-    multiply_vector_scalar(vector, result, num, VECTOR_SIZE);
-    uint32_t end = esp_cpu_get_cycle_count();
+void test_memory(const char *name, volatile int *vector, volatile int *result, int num, int iterations) {
+    uint64_t total_cycles = 0;
 
-    uint32_t cycles = end - start;
-    float cycles_per_byte = (float)cycles / (VECTOR_SIZE * sizeof(int));
+    for (int i = 0; i < iterations; i++) {
+        uint32_t start = esp_cpu_get_cycle_count();
+        multiply_vector_scalar(vector, result, num, VECTOR_SIZE, i);
+        uint32_t end = esp_cpu_get_cycle_count();
+
+        total_cycles += (end - start);
+    }
+
+    float avg_cycles = (float)total_cycles / iterations;
+    float cycles_per_byte = avg_cycles / (VECTOR_SIZE * sizeof(int));
     int memory_size = (VECTOR_SIZE * sizeof(int));
 
-    printf("%s: %lu cycles, %.4f cycles/byte, %i bytes\n", name, (unsigned long)cycles, cycles_per_byte, memory_size);
+    printf("%s: avg %.2f cycles, %.4f cycles/byte, %i bytes (%d iter)\n",
+           name, avg_cycles, cycles_per_byte, memory_size, iterations);
 }
 
 void app_main() {
@@ -77,13 +85,13 @@ void app_main() {
     }
 
     // Esta se repite solo porque la primera siempre estaba saliendo más lenta
-    test_memory("IRAM static (Solo por tiempo lento al inicio)", vector_iram_static, result_iram_static, num_iram_static);
+    test_memory("IRAM static (Solo por tiempo lento al inicio)", vector_iram_static, result_iram_static, num_iram_static, 100);
     // Tests (Estos si cuentan)
-    test_memory("DRAM static", vector_dram_static, result_dram_static, num_dram_static);
-    test_memory("IRAM static", vector_iram_static, result_iram_static, num_iram_static);
-    test_memory("RTC static", vector_rtc_static, result_rtc_static, num_rtc_static);
-    test_memory("FLASH (.rodata)", (int*)vector_flash_ext, result_flash, num_flash);
-    test_memory("DRAM dynamic", vector_dram_dynamic, result_dram_dynamic, num_dram_dynamic);
-    test_memory("IRAM dynamic", vector_iram_dynamic, result_iram_dynamic, num_iram_dynamic);
-    test_memory("PSRAM dynamic", vector_psram_dynamic, result_psram_dynamic, num_psram_dynamic);
+    test_memory("DRAM static", vector_dram_static, result_dram_static, num_dram_static, 100);
+    test_memory("IRAM static", vector_iram_static, result_iram_static, num_iram_static, 100);
+    test_memory("RTC static", vector_rtc_static, result_rtc_static, num_rtc_static, 100);
+    test_memory("FLASH (.rodata)", (int*)vector_flash_ext, result_flash, num_flash, 100);
+    test_memory("DRAM dynamic", vector_dram_dynamic, result_dram_dynamic, num_dram_dynamic, 100);
+    test_memory("IRAM dynamic", vector_iram_dynamic, result_iram_dynamic, num_iram_dynamic, 100);
+    test_memory("PSRAM dynamic", vector_psram_dynamic, result_psram_dynamic, num_psram_dynamic, 100);
 }
