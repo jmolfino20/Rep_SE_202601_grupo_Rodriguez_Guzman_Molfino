@@ -49,6 +49,7 @@ Una vez se encuentren monitoreando el MCU, la consola imprimirá el resultado de
 
 Los resultados obtenidos fueron los siguientes:
 
+### Solo con una repetición
 
 <details>
   <summary><b>Tabla tamaño 20</b></summary>
@@ -140,13 +141,120 @@ Los resultados obtenidos fueron los siguientes:
 
 </details>
 
+### Con 100 repeticiones
+
+<details>
+  <summary><b>Tabla tamaño 20</b></summary>
+
+| Size | Memory Type     | Cycles | Cycles/Byte | Bytes |
+| ---- | --------------- | ------ | ----------- | ----- |
+| 20   | DRAM static     | 337.21 | 4.2151      | 80    |
+| 20   | IRAM static     | 557.23 | 6.9654      | 80    |
+| 20   | RTC static      | 3201.75| 40.0219     | 80    |
+| 20   | FLASH (.rodata) | 350.58 | 4.3822      | 80    |
+| 20   | DRAM dynamic    | 337.20 | 4.2150      | 80    |
+| 20   | IRAM dynamic    | 557.23 | 6.9654      | 80    |
+| 20   | PSRAM dynamic   | 338.54 | 4.2318      | 80    |
+
+</details>
+
+<details>
+  <summary><b>Tabla tamaño 70</b></summary>
+
+| Size | Memory Type     | Cycles | Cycles/Byte | Bytes |
+| ---- | --------------- | ------ | ----------- | ----- |
+| 70   | DRAM static     | 1080.14| 3.8576      | 280   |
+| 70   | IRAM static     | 1839.03| 6.5680      | 280   |
+| 70   | RTC static      | 11249.83| 40.1780     | 280   |
+| 70   | FLASH (.rodata) | 1104.66| 3.9452      | 280   |
+| 70   | DRAM dynamic    | 1069.00| 3.8179      | 280   |
+| 70   | IRAM dynamic    | 1839.03| 6.5680      | 280   |
+| 70   | PSRAM dynamic   | 1079.79| 3.8564      | 280   |
+
+</details>
+
+<details>
+  <summary><b>Tabla tamaño 120</b></summary>
+
+| Size | Memory Type     | Cycles | Cycles/Byte | Bytes |
+| ---- | --------------- | ------ | ----------- | ----- |
+| 120  | DRAM static     | 1830.17| 3.8129      | 480   |
+| 120  | IRAM static     | 3139.03| 6.5396      | 480   |
+| 120  | RTC static      | 19272.08| 40.1502     | 480   |
+| 120  | FLASH (.rodata) | 1880.21| 3.9171      | 480   |
+| 120  | DRAM dynamic    | 1819.05| 3.7897      | 480   |
+| 120  | IRAM dynamic    | 3139.00| 6.5396      | 480   |
+| 120  | PSRAM dynamic   | 1840.68| 3.8348      | 480   |
+
+</details>
+
+<details>
+  <summary><b>Tabla tamaño 170</b></summary>
+
+| Size | Memory Type     | Cycles | Cycles/Byte | Bytes |
+| ---- | --------------- | ------ | ----------- | ----- |
+| 170  | DRAM static     | 2580.20| 3.7944      | 680   |
+| 170  | IRAM static     | 4439.03| 6.5280      | 680   |
+| 170  | RTC static      | 27310.25| 40.1621     | 680   |
+| 170  | FLASH (.rodata) | 2669.32| 3.9255      | 680   |
+| 170  | DRAM dynamic    | 2569.05| 3.7780      | 680   |
+| 170  | IRAM dynamic    | 4453.90| 6.5499      | 680   |
+| 170  | PSRAM dynamic   | 2600.73| 3.8246      | 680   |
+
+</details>
+
+<details>
+  <summary><b>Tabla tamaño 220</b></summary>
+
+| Size | Memory Type     | Cycles | Cycles/Byte | Bytes |
+| ---- | --------------- | ------ | ----------- | ----- |
+| 220  | DRAM static     | 3330.25| 3.7844      | 880   |
+| 220  | IRAM static     | 5739.03| 6.5216      | 880   |
+| 220  | RTC static      | 35345.99| 40.1659     | 880   |
+| 220  | FLASH (.rodata) | 3428.69| 3.8962      | 880   |
+| 220  | DRAM dynamic    | 3320.09| 3.7728      | 880   |
+| 220  | IRAM dynamic    | 5739.00| 6.5216      | 880   |
+| 220  | PSRAM dynamic   | 3357.82| 3.8157      | 880   |
+
+</details>
+
+<details>
+  <summary><b>Tabla tamaño 270</b></summary>
+
+| Size | Memory Type     | Cycles | Cycles/Byte | Bytes |
+| ---- | --------------- | ------ | ----------- | ----- |
+| 270  | DRAM static     | 4080.22| 3.7780      | 1080  |
+| 270  | IRAM static     | 7039.03| 6.5176      | 1080  |
+| 270  | RTC static      | 43374.20| 40.1613     | 1080  |
+| 270  | FLASH (.rodata) | 4202.93| 3.8916      | 1080  |
+| 270  | DRAM dynamic    | 4083.95| 3.7814      | 1080  |
+| 270  | IRAM dynamic    | 7039.00| 6.5176      | 1080  |
+| 270  | PSRAM dynamic   | 4115.32| 3.8105      | 1080  |
+
+</details>
+
 Se hizo un gráfico para hacer esta comparación de manera visual usando el [siguiente Colab](https://colab.research.google.com/drive/1nuUW_SDzyqNbHDTMBrFMNAEKJ7bE05tp?usp=sharing) (También disponible en el archivo [`.ipynb`](./SE_L1_E4.ipynb) del directorio) quedando de esta manera:
 
 <p align="center">
   <img src="./graph_mem_esp.png" width="60%"/>
 </p>
 
+Después se repitieron las mediciones nuevamente, pero repitiendo el _benchmark_ 100 veces para cada memoria y promediando los resultados. Los valores fueron muy distintos a los realizados con una sola prueba, siendo el gráfico el siguiente:
+
+<p align="center">
+  <img src="./graph_mem_100reps.png" width="60%"/>
+</p>
+
+Y haciendo _zoom_ a los valores que están más cercanos se ven así:
+
+<p align="center">
+  <img src="./graph_mem_100reps_faster.png" width="40%"/>
+  <img src="./graph_mem_100reps_iram.png" width="40%"/>
+</p>
+
 ## Análisis
+
+### Análisis a los valores al realizar una repetición
 
 Analizando los datos viendo las tablas y el gráfico, podemos notar que las memorias DRAM, IRAM y PSRAM son significativamente más rápidas de acceder que la memoria FLASH y la RTC, cosa que tiene bastante sentido ya que la FLASH está pensada para tener el firmware, constantes o configuraciones persistentes y no para realizar cálculos con los datos de ella, como pasa con las memorias mas rápidas. Por otro lado la RTC también hace sentido su velocidad, al ser una memoria pensada para usar cuando el dispositivo está en **`Sleep Mode`** por lo que se prioriza el bajo consumo sobre la velocidad.
 
@@ -156,8 +264,24 @@ Con respecto a la IRAM y la PSRAM, no sabíamos muy bien en un principio cual de
 
 Por último, aunque en el gráfico no se vea bien, las diferencias entre las memorias estáticas y dinámicas no fueron considerables, mostrando que la velocidad depende más de la arquitectura de la memoria más que del tipo de esta.
 
+### Análisis a los valores al realizar 100 repeticiones
+
+Al repetir los _benchmarks_ en cada tipo de memoria podemos ver que las mediciones son muy distintas, dejando algo obsoleto el análisis anterior, ¿o no?
+
+En los nuevos gráficos podemos ver cómo la DRAM estática y dinámica sigue siendo la más rápida. Esto hace sentido debido a la explicación entregada anteriormente, siendo que esta es la que se usa para los cálculos generales siendo crucial que esta sea la mejor. 
+
+Con respecto a las segundas más rápidas se nota que hubo una gran diferencia, ya que antes estaba la segunda mejor la IRAM y ahora es la PSRAM. Esta diferencia puede deberse a que al ser una memoria externa es crucial para el MCU cachearla, para evitar tener que transmitir los datos hasta un modulo externo.
+
+Por tercer lugar es, probablemente, la más curiosa por la gran diferencia que tiene en ambas pruebas, ya que pasó la **FLASH** de ser la segunda más lenta a ser la tercera más rápida. Se cree que esta puede ser debido a que, al ser tan lenta (como quedó comprobado en el primer _test_), el MCU prioriza cachear estos valores siempre que pueda, y como el caché es muy rápido justificaría el por qué el buen lugar en el ranking.
+
+Luego viene la IRAM, la que no tiene mucha diferencia con respecto al primer experimento, por lo que se puede explicar de la misma manera que antes. Igualmente que la memoria RTC que también tiene valores parecidos, lo que también permite justificarlos de la misma manera que antes. 
+
+Si la FLASH se cachea por ser lenta, uno podría preguntarse por qué no hacer lo mismo con la RTC, pero si se hiciera lo anterior la RTC perdería su objetivo, que es ser lo más eficiente en energía posible.
+
 ## Aprendizajes
 
 Este ejercicio sirvió para entender el uso de `menuconfig`, al tener que activar la PSRAM, desactivar la seguridad de la memoria para poder escribir sobre la IRAM y conocer las diferencias que hay entre distintas placas.
+
+Por otro lado sirve para ver cómo las instrucciones repetitivas se cachean optimizando mucho el tiempo resultante
 
 También sirvió para entender cómo se manejan las memorias del MCU desde el código, y ver lo importante que es optimizar el uso de estas al haber tanta diferencia de velocidad de lectura entre los distintos tipos.
