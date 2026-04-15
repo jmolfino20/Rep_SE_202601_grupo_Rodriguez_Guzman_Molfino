@@ -56,12 +56,16 @@ Para este ejemplo se usó la siguiente tabla de _Pinout_:
 
 ## Funcionamiento
 
-(Falta rellenar con texto)
+Para este ejercicio se utilizaron los diversos archivos en la carpeta `main`, donde el flujo principal se encuentra en el archivo `Ejercicio_5.c`.
+
+Una vez hecho el `build` y el `flash` a la ESP32S3, se puede ejecutar el comando `monitor` (todos previamente mencionados) para poder interactuar con los motores y obtener los valores de medición usados para realizar los gráficos. Se utilizó un generador de tonos *online* disponible en el siguiente [Link](https://www.szynalski.com/tone-generator/). Si se acerca el teléfono al micrófono en las diversas frecuencias definidas en el código, los motores se comportarán de las diversas maneras solicitadas.
+
+Es importante mencionar que para obtener los diversos gráficos se realizón un proceso más manual, donde al momento de ejecutar el programa, se acercaba al teléfono con la frecuencia deseada al micrófono y se veían lo valores tomados en terminal. Además, modificando el código de `config.h`, se pudo modificar la frecuencia de muestreo, el valor de N para las muestras de la FFT y el valor de bits del ADC, donde para esto último también se modificó el archivo `adc_audio.c`.
+
+Los valores obtenidos en serial al principio del código, se pegaron en el archivo `fft.txt` y también se obtuvo el valor real de la frecuencia de muestreo mediante el código del archivo `Ejercicio_5.c`, para luego tomar estos datos y reemplazarlos en el archivo `espectrograma.py`, modificando además la variable N, dejándola con el valor establecido en config.h.
+
+Con todas estas modificaciones se pudo obtener las mediciones y gráficos disponibles en el documento `output.pdf`.
 
 ![Video de prueba](./ej_5_test.mp4)
 
-(También agregar el espectrograma del audio capturado)
 
-## Análisis
-
-(Falta probar cambiar resolución y esas cosas pa poner un análisis)
