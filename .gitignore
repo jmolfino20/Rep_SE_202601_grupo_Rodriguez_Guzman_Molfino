@@ -11,3 +11,6 @@ sdkconfig.old
 *.map
 
 .vscode/
+
+venv/
+**/venv/
