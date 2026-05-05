@@ -2,13 +2,13 @@
 #include "driver/gpio.h"
 #include "driver/ledc.h"
 
-#define IN1 18
-#define IN2 17
-#define IN3 16
-#define IN4 15
+#define IN1 19
+#define IN2 8
+#define IN3 18
+#define IN4 17
 
-#define ENA 3
-#define ENB 6
+#define ENA 20
+#define ENB 16
 
 #define PWM_FREQ 500
 #define PWM_RES  LEDC_TIMER_8_BIT
@@ -59,8 +59,8 @@ void motor_stop()
 
 void motor_forward(uint8_t dutyA, uint8_t dutyB)
 {
-    gpio_set_level(IN1, 1);
-    gpio_set_level(IN2, 0);
+    gpio_set_level(IN1, 0);
+    gpio_set_level(IN2, 1);
 
     gpio_set_level(IN3, 1);
     gpio_set_level(IN4, 0);
@@ -74,8 +74,8 @@ void motor_forward(uint8_t dutyA, uint8_t dutyB)
 
 void motor_backward(uint8_t dutyA, uint8_t dutyB)
 {
-    gpio_set_level(IN1, 0);
-    gpio_set_level(IN2, 1);
+    gpio_set_level(IN1, 1);
+    gpio_set_level(IN2, 0);
 
     gpio_set_level(IN3, 0);
     gpio_set_level(IN4, 1);
