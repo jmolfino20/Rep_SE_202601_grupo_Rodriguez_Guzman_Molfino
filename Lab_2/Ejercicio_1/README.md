@@ -14,20 +14,8 @@ Este ejercicio sirve para probar la comunicación inalámbrica usando ESP32. Al 
 
 Este método se conecta mediante _Bluetooth Low Energy_ (BLE) para la comunicación inalámbrica. Se cree que los _pros_ pueden ser el bajo consumo energético y la ligereza en CPU y RAM, mientras que por otro lado, se espera ver los _contras_ que serían una posible inestabilidad en caso de haber muchos dispositivos usando BLE por un colapso en el canal.
 
+Se dejaron las 2 versiones en el repositorio en caso de que por colapso de algun canal (Bluetooth o WiFi) el día de la carrera, se cambie en ese momento y evitar problemas.
+
 ### Mediante ESP32 modo AP
 
-Probar método
-
-### Mediante conectar ESP32 y PC por Websocket usando WiFi común
-
-probar método
-
-## Análisis
-
-El método 1 usaba...
-
-El método 2 usaba...
-
-El método 3 usaba...
-
-Al ver el consumo de memoria y CPU de cada uno de los métodos, se decidió optar por ${METODO-GANADOR} dado a que es crucial optimizar al máximo los recursos si se quiere ejecutar TinyML para encontrar los identificadores o bordes.
+**[Probar método](./AP-version/)**
