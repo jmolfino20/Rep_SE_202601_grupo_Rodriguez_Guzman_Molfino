@@ -34,12 +34,12 @@ static int write_cb(uint16_t conn_handle,
         case 0: motor_stop(); break;
         case 3: motor_forward(255, 255); break;
         case 7: motor_backward(255, 255); break;
-        case 1: motor_forward(255, 0); break;
-        case 5: motor_forward(0, 255); break;
-        case 2: motor_forward(255, 150); break;
-        case 4: motor_forward(150, 255); break;
-        case 6: motor_backward(150, 255); break;
-        case 8: motor_backward(255, 150); break;
+        case 1: motor_forward(0, 255); break;
+        case 5: motor_forward(255, 0); break;
+        case 2: motor_forward(120, 255); break;
+        case 4: motor_forward(255, 120); break;
+        case 6: motor_backward(255, 120); break;
+        case 8: motor_backward(120, 255); break;
     }
 
     return 0;
