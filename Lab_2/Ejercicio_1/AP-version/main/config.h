@@ -2,13 +2,13 @@
 #define CONFIG_H
 
 // Pines motores (elige seguros en ESP32)
-#define IN1 5
-#define IN2 6
-#define IN3 8
-#define IN4 9
+#define IN1 18
+#define IN2 17
+#define IN3 16
+#define IN4 15
 
-#define ENA 4
-#define ENB 7
+#define ENA 3
+#define ENB 6
 
 // WiFi
 #define WIFI_SSID "ESP32_grupo8"
