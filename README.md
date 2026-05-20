@@ -10,7 +10,7 @@ Repositorio para subir códigos y análisis relacionados a los laboratorios y el
 
 - [Laboratorio 1](./Lab_1/README.md)
 - [Laboratorio 2](./Lab_2/README.md)
-- Laboratorio 3
+- [Laboratorio 3](./Lab_3/README.md)
 
 ### Proyecto
 
