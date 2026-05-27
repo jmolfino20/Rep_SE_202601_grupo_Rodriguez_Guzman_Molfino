@@ -23,6 +23,7 @@ limitations under the License.
 #include "model.h"
 #include "constants.h"
 #include "output_handler.h"
+#include "esp_timer.h"
 
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
@@ -89,7 +90,9 @@ void loop() {
   input->data.int8[0] = x_quantized;
 
   // Run inference, and report any error
+  int64_t start = esp_timer_get_time();
   TfLiteStatus invoke_status = interpreter->Invoke();
+  int64_t end = esp_timer_get_time();
   if (invoke_status != kTfLiteOk) {
     MicroPrintf("Invoke failed on x: %f\n",
                          static_cast<double>(x));
@@ -103,7 +106,7 @@ void loop() {
 
   // Output the results. A custom HandleOutput function can be implemented
   // for each supported hardware target.
-  HandleOutput(x, y);
+  printf("x=%f y=%f time=%lld us\n", x, y, (long long)(end - start));
 
   // Increment the inference_counter, and reset it if we have reached
   // the total number per cycle
