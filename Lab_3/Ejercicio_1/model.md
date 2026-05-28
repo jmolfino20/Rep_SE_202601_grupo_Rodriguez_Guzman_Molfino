@@ -1,5 +1,7 @@
 # Modelo base
 
+<!--> Esto es lo que saqué de Netrón, es más que nada para tenerlo escrito para pasarlo a direct implementation <-->
+
 ## Visualización en Netron
 
 ![Modelo](./model_netron.png)
