@@ -6,7 +6,7 @@
 
 ## Introducción
 
-Este ejercicio es para ver el consumo de TinyML en los _end devices_, para lo que se usará el ejemplo de **Tensorflow Lite Micro** que infiere la función seno.
+Este ejercicio es para ver el consumo de TinyML en los _end devices_, para lo que se usará el ejemplo de **Tensorflow Lite Micro** que infiere la función seno. Para esto, ambas implementaciones se ejecutar con la frecuencia del MCU en 160 MHz.
 
 ## Consideraciones
 
@@ -105,7 +105,7 @@ Nuevamente, la primera inferencia es mayor a las demás debido al _overhead_. Si
 
 ## Análisis
 
-Viendo los resultados podemos sacar las siguientes conclusiones:
+Viendo los resultados se pueden hacer los siguientes análisis:
 
 ### Potencia
 
@@ -118,3 +118,7 @@ Con respecto al tiempo, se puede ver una mejora significativa, siendo cerca de 3
 ### Resultados
 
 Si bien los resultados obtenidos de inferencia se esperaba que fueran iguales, las diferencias que hay pueden deberse a realizar operaciones con decimales pequeños que algunos compiladores pueden aproximar de manera distinta o que las operaciones de DSP hacen aproximaciones para optimizar la ejecución.
+
+## Conclusión
+
+Con los resultados obtenidos, se puede concluir que la implementación directa es más bastante más eficiente en tiempo de ejecución, y un poco menos eficiente en cuanto a presición y potencia. Considerando sólo estos puntos se cree que para la tarea del proyecto final, el _trade-off_ hace que sea más lógico usar una implementación directa, pero este análisis no consideró tiempo de código, que en cuanto a la implementación directa, el crear el archivo [`model.h`](./direct_implementation/main/model.h) puede ser complicado, incluso con el modelo simple que se usó para esta implementación. Considerando que, probablemente, el próximo modelo sea aún más complejo, es más lógico usar TF Lite Micro para facilitar el proceso.
