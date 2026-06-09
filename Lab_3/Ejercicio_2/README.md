@@ -21,3 +21,11 @@ de 1 a 0.
 Con esto se modificó el código para que cada vez que detectara una persona o algo con certeza sobre 60%, prende el LED.
 
 De esta manera se logró el comportamiento presentado en el link del video de output.pdf.
+
+## Resultados
+
+La **ESPCAM** fue capaz de detectar personas en tiempo real, probamos poniendonos en frente al MCU y detectó correctamente como se puede ver a continuación.
+
+![Rodrigo Guzmán](./person_rodri.gif)
+![Joaquín Molfino](./person_molfino.gif)
+![Raimundo Rodríguez](./person_rai.gif)
