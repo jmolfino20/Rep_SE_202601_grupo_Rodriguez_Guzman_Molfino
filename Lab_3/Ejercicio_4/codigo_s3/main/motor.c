@@ -2,7 +2,7 @@
     #include "driver/gpio.h"
     #include "driver/ledc.h"
 
-    #define IN1 18
+    #define IN1 17
     #define IN2 8
     #define IN3 9
     #define IN4 10
