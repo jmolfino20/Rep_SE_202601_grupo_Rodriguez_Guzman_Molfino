@@ -1,0 +1,8 @@
+#ifndef UART_RX_H
+#define UART_RX_H
+
+void uart_rx_init(void);
+void uart_border_task(void *arg);
+void uart_id_task(void *arg);
+
+#endif
