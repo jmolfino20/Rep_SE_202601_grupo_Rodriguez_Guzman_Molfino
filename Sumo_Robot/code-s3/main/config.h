@@ -58,7 +58,7 @@
  * se ignora (ruido de fondo). Subir si hay falsas detecciones,       *
  * bajar si no detecta notas aunque haya señal.                       *
  * ──────────────────────────────────────────────────────────────────*/
-#define AUDIO_MIN_MAGNITUDE   0.3f
+#define AUDIO_MIN_MAGNITUDE   0.00000003f
 
 /* ── Audio note → command frequency bands (Hz) ──────────────────── */
 #define AUDIO_FWD_LO     490.0f

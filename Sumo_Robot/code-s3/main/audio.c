@@ -122,6 +122,7 @@ void audio_task(void *arg) {
         } else {
             if (g_audio_override) {
                 ESP_LOGW(TAG, "INT AUDIO: sin nota -> motor libre");
+                motor_stop();
             }
             g_audio_override = 0;
         }
