@@ -58,17 +58,17 @@
  * se ignora (ruido de fondo). Subir si hay falsas detecciones,       *
  * bajar si no detecta notas aunque haya señal.                       *
  * ──────────────────────────────────────────────────────────────────*/
-#define AUDIO_MIN_MAGNITUDE   0.001f
+#define AUDIO_MIN_MAGNITUDE   0.3f
 
 /* ── Audio note → command frequency bands (Hz) ──────────────────── */
 #define AUDIO_FWD_LO     490.0f
 #define AUDIO_FWD_HI     510.0f
 #define AUDIO_BACK_LO    690.0f
 #define AUDIO_BACK_HI    710.0f
-#define AUDIO_LEFT_LO    890.0f
-#define AUDIO_LEFT_HI   910.0f
-#define AUDIO_RIGHT_LO  1090.0f
-#define AUDIO_RIGHT_HI  1110.0f
+#define AUDIO_LEFT_LO    850.0f
+#define AUDIO_LEFT_HI    870.0f
+#define AUDIO_RIGHT_LO  1180.0f
+#define AUDIO_RIGHT_HI  1210.0f
 
 /* ── Modo de operación ──────────────────────────────────────────── *
  *  Cambiar ROBOT_MODE para seleccionar qué probar:                  *
@@ -84,6 +84,6 @@
 #define MODE_ID           3
 #define MODE_BUTTON       4
 
-#define ROBOT_MODE MODE_BORDER
+#define ROBOT_MODE MODE_AUDIO
 
 #endif /* CONFIG_H */

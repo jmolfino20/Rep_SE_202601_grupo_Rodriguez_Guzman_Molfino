@@ -44,10 +44,15 @@ void fft_compute(float *input, float *output) {
  * (indica que no hay señal real, solo ruido de fondo).
  */
 float fft_find_peak(float *spectrum, float fs, float *out_magnitude) {
-    int   max_idx = 1;
-    float max_val = spectrum[1];
+    // Ignorar todo bajo MIN_FREQ_HZ (ruido 50Hz y armónicos)
+    const float MIN_FREQ_HZ = 200.0f;
+    int start_bin = (int)(MIN_FREQ_HZ * FFT_SIZE / fs) + 1;  // ~51 con fs=4000, FFT=1024
 
-    for (int i = 2; i < FFT_SIZE / 2; i++) {
+    int   max_idx = start_bin;
+    float max_val = spectrum[start_bin];
+    int end_bin = (int)(FFT_SIZE / 2 * 0.9f);  // ~460 con FFT=1024
+
+    for (int i = start_bin + 1; i < end_bin; i++) {
         if (spectrum[i] > max_val) {
             max_val = spectrum[i];
             max_idx = i;
@@ -56,7 +61,7 @@ float fft_find_peak(float *spectrum, float fs, float *out_magnitude) {
 
     if (out_magnitude) *out_magnitude = max_val;
 
-    if (max_val < AUDIO_MIN_MAGNITUDE) return 0.0f;   /* señal demasiado débil */
+    if (max_val < AUDIO_MIN_MAGNITUDE) return 0.0f;
 
     return (max_idx * fs) / FFT_SIZE;
 }
