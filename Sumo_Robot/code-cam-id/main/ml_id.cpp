@@ -63,16 +63,20 @@ extern "C" void ml_id_init(void) {
     s_input  = s_interpreter->input(0);
     s_output = s_interpreter->output(0);
 
+    int n_classes = s_output->dims->data[s_output->dims->size - 1];
+
     ESP_LOGI(TAG, "modelo cargado OK");
     ESP_LOGI(TAG, "  arena usada: %u / %d bytes",
              (unsigned)s_interpreter->arena_used_bytes(), kArenaSize);
-    ESP_LOGI(TAG, "  input:  tipo=%d  shape=[%d,%d,%d,%d]",
-             s_input->type,
+    ESP_LOGI(TAG, "  input:  tipo=%d  zp=%d  scale=%.6f  shape=[%d,%d,%d,%d]",
+             s_input->type, s_input->params.zero_point, s_input->params.scale,
              s_input->dims->data[0], s_input->dims->data[1],
              s_input->dims->data[2], s_input->dims->data[3]);
-    ESP_LOGI(TAG, "  output: tipo=%d  scale=%.6f  zero_point=%d",
-             s_output->type,
-             s_output->params.scale, s_output->params.zero_point);
+    ESP_LOGI(TAG, "  output: tipo=%d  zp=%d  scale=%.6f  n_clases=%d",
+             s_output->type, s_output->params.zero_point, s_output->params.scale,
+             n_classes);
+    ESP_LOGI(TAG, "  idx positivo usado: %d  (umbral=%.2f)",
+             (n_classes >= 2) ? 1 : 0, (float)ID_THRESHOLD);
 }
 
 extern "C" bool ml_id_detect(uint8_t *img, int w, int h) {
@@ -83,10 +87,14 @@ extern "C" bool ml_id_detect(uint8_t *img, int w, int h) {
         return false;
     }
 
-    /* Convertir uint8 [0-255] a int8 [-128,127] que espera el tensor INT8 */
+    /* Convertir uint8 [0-255] al rango INT8 usando el zero_point real del tensor.
+     * Para modelos INT8 estándar: zero_point=-128, lo que resulta en img[i]-128.
+     * Hardcodear 128 falla si el modelo fue cuantizado con otro zero_point. */
     int8_t *input_data = s_input->data.int8;
+    int32_t in_zp = s_input->params.zero_point;
     for (int i = 0; i < IMG_WIDTH * IMG_HEIGHT; i++) {
-        input_data[i] = (int8_t)((int)img[i] - 128);
+        int32_t q = (int32_t)img[i] + in_zp;
+        input_data[i] = (int8_t)(q < -128 ? -128 : (q > 127 ? 127 : q));
     }
 
     if (s_interpreter->Invoke() != kTfLiteOk) {
@@ -94,16 +102,36 @@ extern "C" bool ml_id_detect(uint8_t *img, int w, int h) {
         return false;
     }
 
-    /* Dequantizar salida INT8 -> float via scale/zero_point del tensor */
+    /* Para clasificador de 2 clases con softmax: output = [prob_negativa, prob_positiva].
+     * Leer índice 0 siempre daba el score de la clase NEGATIVA → nunca superaba 0.5
+     * cuando el ID estaba presente. Se elige índice 1 para modelos de 2+ clases. */
+    int n_classes = s_output->dims->data[s_output->dims->size - 1];
+    int out_idx   = (n_classes >= 2) ? 1 : 0;
+
     float score;
     if (s_output->type == kTfLiteInt8) {
-        int8_t raw = s_output->data.int8[0];
+        int8_t raw = s_output->data.int8[out_idx];
         score = (raw - s_output->params.zero_point) * s_output->params.scale;
     } else if (s_output->type == kTfLiteFloat32) {
-        score = s_output->data.f[0];
+        score = s_output->data.f[out_idx];
     } else {
         ESP_LOGE(TAG, "tipo de salida no soportado: %d", s_output->type);
         return false;
+    }
+
+    /* Primera inferencia: vuelca todos los scores para verificar el orden de clases */
+    static bool first_call = true;
+    if (first_call) {
+        first_call = false;
+        ESP_LOGI(TAG, "PRIMERA INFERENCIA: n_clases=%d  idx_positivo=%d", n_classes, out_idx);
+        for (int i = 0; i < n_classes; i++) {
+            float s_i;
+            if (s_output->type == kTfLiteInt8)
+                s_i = (s_output->data.int8[i] - s_output->params.zero_point) * s_output->params.scale;
+            else
+                s_i = s_output->data.f[i];
+            ESP_LOGI(TAG, "  output[%d] = %.4f", i, s_i);
+        }
     }
 
     bool detected = (score >= ID_THRESHOLD);
@@ -111,11 +139,10 @@ extern "C" bool ml_id_detect(uint8_t *img, int w, int h) {
     /* Loguear solo en cambios de estado para no saturar el monitor */
     static bool prev = false;
     if (detected != prev) {
-        if (detected) {
-            ESP_LOGW(TAG, "ID DETECTADO  (score=%.4f >= %.2f)", score, (float)ID_THRESHOLD);
-        } else {
-            ESP_LOGI(TAG, "ID perdido    (score=%.4f <  %.2f)", score, (float)ID_THRESHOLD);
-        }
+        if (detected)
+            ESP_LOGW(TAG, "ID DETECTADO  (score=%.4f >= %.2f, idx=%d/%d)", score, (float)ID_THRESHOLD, out_idx, n_classes);
+        else
+            ESP_LOGI(TAG, "ID perdido    (score=%.4f <  %.2f, idx=%d/%d)", score, (float)ID_THRESHOLD, out_idx, n_classes);
         prev = detected;
     }
 

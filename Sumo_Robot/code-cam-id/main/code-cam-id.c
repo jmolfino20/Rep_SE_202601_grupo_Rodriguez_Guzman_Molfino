@@ -96,14 +96,17 @@ static void uart_send_task(void *arg) {
                 prev = val;
             }
         }
+        /* Sin este delay la task loopea a velocidad máxima, llenando el buffer
+         * UART del S3 a 11520 bytes/s con el mismo byte repetido. */
+        vTaskDelay(pdMS_TO_TICKS(DETECT_PERIOD_MS));
     }
 }
 
 void app_main(void) {
     ESP_LOGI(TAG, "=== CamID iniciando ===");
     camera_init();
-    uart_init();
-    ml_id_init();
+    ml_id_init();   /* antes de uart_init: los logs del modelo aparecen en consola */
+    uart_init();    /* remapea GPIO1/GPIO3 de UART0 a UART1 -- consola se pierde aqui */
 
     g_queue = xQueueCreate(1, sizeof(uint8_t));
 
