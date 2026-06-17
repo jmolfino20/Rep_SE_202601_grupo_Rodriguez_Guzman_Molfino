@@ -4,8 +4,11 @@
 #include "freertos/queue.h"
 #include "esp_camera.h"
 #include "driver/uart.h"
+#include "esp_log.h"
 #include "ml_id.h"
 #include "config.h"
+
+#define TAG "CAM_ID"
 
 static QueueHandle_t g_queue;   /* mailbox de 1 byte entre los dos cores */
 
@@ -30,6 +33,7 @@ static void camera_init(void) {
         .fb_location  = CAMERA_FB_IN_DRAM,
     };
     ESP_ERROR_CHECK(esp_camera_init(&cfg));
+    ESP_LOGI(TAG, "camara inicializada OK (%dx%d, escala de grises)", IMG_WIDTH, IMG_HEIGHT);
 }
 
 static void uart_init(void) {
@@ -40,19 +44,36 @@ static void uart_init(void) {
         .stop_bits  = UART_STOP_BITS_1,
         .flow_ctrl  = UART_HW_FLOWCTRL_DISABLE,
     };
-    uart_driver_install(UART_PORT, 256, 0, 0, NULL, 0);
     uart_param_config(UART_PORT, &cfg);
     uart_set_pin(UART_PORT, UART_TX_PIN, UART_RX_PIN, -1, -1);
+    uart_driver_install(UART_PORT, 256, 0, 0, NULL, 0);
+    ESP_LOGI(TAG, "UART inicializado OK (UART_NUM_%d, TX=GPIO%d, baud=%d)",
+             (int)UART_PORT, UART_TX_PIN, UART_BAUD);
 }
 
 /* Core 0: captura frame y ejecuta inferencia ML */
 static void id_detect_task(void *arg) {
+    uint32_t frames     = 0;
+    uint32_t fb_errors  = 0;
+
+    ESP_LOGI(TAG, "id_detect_task iniciada (periodo=%d ms)", DETECT_PERIOD_MS);
+
     while (1) {
         camera_fb_t *fb = esp_camera_fb_get();
         if (fb) {
             uint8_t result = ml_id_detect(fb->buf, fb->width, fb->height) ? 1 : 0;
             esp_camera_fb_return(fb);
             xQueueOverwrite(g_queue, &result);
+            frames++;
+
+            /* Heartbeat cada 100 frames (~5 s a 50 ms/frame) */
+            if (frames % 100 == 0) {
+                ESP_LOGI(TAG, "MONITOR | frames=%u  fb_errors=%u  ultimo_resultado=%d",
+                         frames, fb_errors, result);
+            }
+        } else {
+            fb_errors++;
+            ESP_LOGW(TAG, "esp_camera_fb_get fallo (total=%u)", fb_errors);
         }
         vTaskDelay(pdMS_TO_TICKS(DETECT_PERIOD_MS));
     }
@@ -60,14 +81,26 @@ static void id_detect_task(void *arg) {
 
 /* Core 1: envía el último resultado por UART al S3 */
 static void uart_send_task(void *arg) {
-    uint8_t val = 0;
+    uint8_t val  = 0;
+    uint8_t prev = 0xFF;
+
+    ESP_LOGI(TAG, "uart_send_task iniciada");
+
     while (1) {
-        if (xQueuePeek(g_queue, &val, pdMS_TO_TICKS(DETECT_PERIOD_MS * 2)))
+        if (xQueuePeek(g_queue, &val, pdMS_TO_TICKS(DETECT_PERIOD_MS * 2))) {
             uart_write_bytes(UART_PORT, &val, 1);
+
+            /* Loguear solo en cambio de valor */
+            if (val != prev) {
+                ESP_LOGI(TAG, "UART tx=0x%02X (ID=%s)", val, val ? "DETECTADO" : "libre");
+                prev = val;
+            }
+        }
     }
 }
 
 void app_main(void) {
+    ESP_LOGI(TAG, "=== CamID iniciando ===");
     camera_init();
     uart_init();
     ml_id_init();

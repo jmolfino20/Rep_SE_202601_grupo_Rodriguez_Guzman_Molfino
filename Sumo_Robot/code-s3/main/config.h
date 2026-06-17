@@ -15,14 +15,16 @@
 #define MOTOR_PWM_RES    LEDC_TIMER_8_BIT
 
 /* ── UART from CamBorder (ESP32-CAM 1) ──────────────────────────── */
+/* GPIO43/44 = UART0 consola ESP-IDF -- 39/38 evitan el conflicto    */
 #define UART_BORDER_PORT   UART_NUM_1
-#define UART_BORDER_RX     44
-#define UART_BORDER_TX     43
+#define UART_BORDER_RX     40
+#define UART_BORDER_TX     41
 
 /* ── UART from CamID (ESP32-CAM 2) ─────────────────────────────── */
+/* GPIO15/16 ocupados por Flash Octal interno del N16R8 — no usables */
 #define UART_ID_PORT       UART_NUM_2
-#define UART_ID_RX         16
-#define UART_ID_TX         15
+#define UART_ID_RX         38
+#define UART_ID_TX         39
 
 /* ── Microphone (ADC, GPIO 1 = ADC1_CH0) ────────────────────────── */
 #define AUDIO_ADC_CHANNEL  ADC_CHANNEL_0
@@ -31,7 +33,7 @@
 #define ADC_BITWIDTH_CFG   ADC_BITWIDTH_12
 
 /* ── Button / switch (Attack trigger, active-low) ───────────────── */
-#define BUTTON_PIN    2
+#define BUTTON_PIN   2
 
 /* ── State-machine timing (ms) ──────────────────────────────────── */
 #define IDLE_FWD_MS              4000
@@ -42,13 +44,13 @@
 #define FAST_SEARCH_MAX_CYCLES      2
 
 /* ── Motor duty values (0–255) ──────────────────────────────────── */
-#define DUTY_IDLE_FWD       90
+#define DUTY_IDLE_FWD       100
 #define DUTY_DETECTED_FWD   120
 #define DUTY_ATTACK_FWD     200
 #define DUTY_ATTACK_BACK    100
-#define DUTY_TURN           90
-#define DUTY_FAST_TURN      90
-#define DUTY_BORDER_TURN    90
+#define DUTY_TURN           100
+#define DUTY_FAST_TURN      100
+#define DUTY_BORDER_TURN    100
 
 /* ── Audio FFT ───────────────────────────────────────────────────── *
  * AUDIO_MIN_MAGNITUDE: umbral de magnitud del pico FFT para          *
@@ -56,7 +58,7 @@
  * se ignora (ruido de fondo). Subir si hay falsas detecciones,       *
  * bajar si no detecta notas aunque haya señal.                       *
  * ──────────────────────────────────────────────────────────────────*/
-#define AUDIO_MIN_MAGNITUDE   0.01f
+#define AUDIO_MIN_MAGNITUDE   0.001f
 
 /* ── Audio note → command frequency bands (Hz) ──────────────────── */
 #define AUDIO_FWD_LO     490.0f

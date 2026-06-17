@@ -44,7 +44,10 @@ static bool delay_ms(uint32_t ms) {
 static RobotState run_idle(void) {
     ESP_LOGI(TAG, "IDLE: avanzando recto (%d ms)", IDLE_FWD_MS);
     motor_forward(DUTY_IDLE_FWD, DUTY_IDLE_FWD);
-    if (!delay_ms(IDLE_FWD_MS)) return STATE_IDLE;
+    if (!delay_ms(IDLE_FWD_MS)) {
+        ESP_LOGW(TAG, "IDLE: avance interrumpido por borde -> forzando IDLE");
+        return STATE_IDLE;
+    }
 
     if (g_id_detected) {
         ESP_LOGI(TAG, "IDLE → DETECTED  [causa: ID detectado]");
@@ -57,7 +60,10 @@ static RobotState run_idle(void) {
 
     ESP_LOGI(TAG, "IDLE: girando derecha (%d ms)", IDLE_TURN_MS);
     motor_right(DUTY_TURN, DUTY_TURN);
-    if (!delay_ms(IDLE_TURN_MS)) return STATE_IDLE;
+    if (!delay_ms(IDLE_TURN_MS)) {
+        ESP_LOGW(TAG, "IDLE: giro interrumpido por borde -> forzando IDLE");
+        return STATE_IDLE;
+    }
 
     if (g_id_detected) {
         ESP_LOGI(TAG, "IDLE → DETECTED  [causa: ID detectado durante giro]");
@@ -73,7 +79,10 @@ static RobotState run_idle(void) {
 
 static RobotState run_detected(void) {
     motor_forward(DUTY_DETECTED_FWD, DUTY_DETECTED_FWD);
-    if (!delay_ms(50)) return STATE_IDLE;
+    if (!delay_ms(50)) {
+        ESP_LOGW(TAG, "DETECTED: avance interrumpido por borde -> forzando IDLE");
+        return STATE_IDLE;
+    }
 
     if (button_pressed()) {
         ESP_LOGI(TAG, "DETECTED → ATTACK  [causa: botón presionado]");
@@ -92,7 +101,10 @@ static RobotState run_fast_search(void) {
     for (int i = 0; i < 3; i++) {
         ESP_LOGI(TAG, "FAST_SEARCH: giro izquierda %d/3", i + 1);
         motor_left(DUTY_FAST_TURN, DUTY_FAST_TURN);
-        if (!delay_ms(FAST_SEARCH_TURN_MS)) return STATE_IDLE;
+        if (!delay_ms(FAST_SEARCH_TURN_MS)) {
+            ESP_LOGW(TAG, "FAST_SEARCH: giro izq %d interrumpido por borde -> forzando IDLE", i + 1);
+            return STATE_IDLE;
+        }
         if (g_id_detected) {
             ESP_LOGI(TAG, "FAST_SEARCH → DETECTED  [causa: ID encontrado girando izq]");
             return STATE_DETECTED;
@@ -107,7 +119,10 @@ static RobotState run_fast_search(void) {
     for (int i = 0; i < FAST_SEARCH_MAX_CYCLES; i++) {
         ESP_LOGI(TAG, "FAST_SEARCH: giro derecha %d/%d", i + 1, FAST_SEARCH_MAX_CYCLES);
         motor_right(DUTY_FAST_TURN, DUTY_FAST_TURN);
-        if (!delay_ms(FAST_SEARCH_TURN_MS)) return STATE_IDLE;
+        if (!delay_ms(FAST_SEARCH_TURN_MS)) {
+            ESP_LOGW(TAG, "FAST_SEARCH: giro der %d interrumpido por borde -> forzando IDLE", i + 1);
+            return STATE_IDLE;
+        }
         if (g_id_detected) {
             ESP_LOGI(TAG, "FAST_SEARCH → DETECTED  [causa: ID encontrado girando der]");
             return STATE_DETECTED;
@@ -192,9 +207,5 @@ void state_machine_task(void *arg) {
             default:                state = STATE_IDLE;        break;
         }
 
-        /* Log de transición (para estados que no loguean internamente su destino) */
-        if (state != prev_state && prev_state == STATE_DETECTED && state == STATE_DETECTED) {
-            /* sin cambio real, no loguear */
-        }
     }
 }

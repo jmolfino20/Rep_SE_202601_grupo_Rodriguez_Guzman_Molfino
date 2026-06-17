@@ -19,7 +19,13 @@ volatile uint8_t g_border_detected = 0;
 volatile uint8_t g_audio_override  = 0;
 
 void app_main(void) {
-    nvs_flash_init();
+    esp_err_t nvs_ret = nvs_flash_init();
+    if (nvs_ret == ESP_ERR_NVS_NO_FREE_PAGES || nvs_ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_LOGW(TAG, "NVS corrupta, borrando y reiniciando...");
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        nvs_ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(nvs_ret);
 
     /* Botón de ataque (activo en bajo) */
     gpio_config_t btn = {
@@ -45,7 +51,7 @@ void app_main(void) {
      * Avanza recto; al detectar borde gira derecha hasta despejarlo.
      * Verificar logs "TEST_BORDER" y que UART_NUM_1 recibe datos. */
     ESP_LOGI(TAG, "=== Modo: BORDER (prueba CamBorder) ===");
-    uart_rx_init();
+    uart_border_init();
     xTaskCreatePinnedToCore(uart_border_task, "uart_border", 2048, NULL, 3, NULL, 0);
     xTaskCreatePinnedToCore(test_border_task, "test_border", 4096, NULL, 4, NULL, 0);
 
@@ -54,7 +60,7 @@ void app_main(void) {
      * Avanza cuando la cámara ve el identificador, para si lo pierde.
      * Verificar logs "TEST_ID" y que UART_NUM_2 recibe datos. */
     ESP_LOGI(TAG, "=== Modo: ID (prueba CamID) ===");
-    uart_rx_init();
+    uart_id_init();
     xTaskCreatePinnedToCore(uart_id_task, "uart_id", 2048, NULL, 3, NULL, 0);
     xTaskCreatePinnedToCore(test_id_task, "test_id", 4096, NULL, 4, NULL, 0);
 

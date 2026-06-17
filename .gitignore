@@ -14,3 +14,5 @@ sdkconfig.old
 
 venv/
 **/venv/
+
+*.cache/
