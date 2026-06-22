@@ -84,6 +84,6 @@
 #define MODE_ID           3
 #define MODE_BUTTON       4
 
-#define ROBOT_MODE MODE_AUDIO
+#define ROBOT_MODE MODE_COMPETITION
 
 #endif /* CONFIG_H */

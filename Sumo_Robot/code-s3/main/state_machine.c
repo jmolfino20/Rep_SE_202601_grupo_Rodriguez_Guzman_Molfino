@@ -42,36 +42,32 @@ static bool delay_ms(uint32_t ms) {
 /* ── Estados ─────────────────────────────────────────────────────── */
 
 static RobotState run_idle(void) {
-    ESP_LOGI(TAG, "IDLE: avanzando recto (%d ms)", IDLE_FWD_MS);
+    /* Avanza chequeando ID cada 50ms en vez de esperar 4s ciego */
     motor_forward(DUTY_IDLE_FWD, DUTY_IDLE_FWD);
-    if (!delay_ms(IDLE_FWD_MS)) {
-        ESP_LOGW(TAG, "IDLE: avance interrumpido por borde -> forzando IDLE");
-        return STATE_IDLE;
+    for (int i = 0; i < IDLE_FWD_MS / 50; i++) {
+        if (!delay_ms(50)) return STATE_IDLE;
+        if (g_id_detected) {
+            ESP_LOGI(TAG, "IDLE → DETECTED  [causa: ID detectado]");
+            return STATE_DETECTED;
+        }
+        if (button_pressed()) {
+            ESP_LOGI(TAG, "IDLE → ATTACK  [causa: botón]");
+            return STATE_ATTACK;
+        }
     }
 
-    if (g_id_detected) {
-        ESP_LOGI(TAG, "IDLE → DETECTED  [causa: ID detectado]");
-        return STATE_DETECTED;
-    }
-    if (button_pressed()) {
-        ESP_LOGI(TAG, "IDLE → ATTACK  [causa: botón presionado]");
-        return STATE_ATTACK;
-    }
-
-    ESP_LOGI(TAG, "IDLE: girando derecha (%d ms)", IDLE_TURN_MS);
+    /* Gira chequeando ID cada 50ms */
     motor_right(DUTY_TURN, DUTY_TURN);
-    if (!delay_ms(IDLE_TURN_MS)) {
-        ESP_LOGW(TAG, "IDLE: giro interrumpido por borde -> forzando IDLE");
-        return STATE_IDLE;
-    }
-
-    if (g_id_detected) {
-        ESP_LOGI(TAG, "IDLE → DETECTED  [causa: ID detectado durante giro]");
-        return STATE_DETECTED;
-    }
-    if (button_pressed()) {
-        ESP_LOGI(TAG, "IDLE → ATTACK  [causa: botón presionado durante giro]");
-        return STATE_ATTACK;
+    for (int i = 0; i < IDLE_TURN_MS / 50; i++) {
+        if (!delay_ms(50)) return STATE_IDLE;
+        if (g_id_detected) {
+            ESP_LOGI(TAG, "IDLE → DETECTED  [causa: ID detectado durante giro]");
+            return STATE_DETECTED;
+        }
+        if (button_pressed()) {
+            ESP_LOGI(TAG, "IDLE → ATTACK  [causa: botón durante giro]");
+            return STATE_ATTACK;
+        }
     }
 
     return STATE_IDLE;

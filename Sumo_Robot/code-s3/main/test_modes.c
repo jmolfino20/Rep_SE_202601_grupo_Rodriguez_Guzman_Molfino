@@ -49,38 +49,34 @@ void test_border_task(void *arg) {
 }
 
 /* ── MODE_ID ─────────────────────────────────────────────────────────
- * Avanza cuando la CamID detecta un identificador, se detiene si lo pierde.
- *
- * Monitor: imprime estado cada 500 ms.
+ * Binario: 0=Sin ID, 1=Con ID.
+ * Avanza cuando detecta el identificador, se detiene si lo pierde.
  */
 void test_id_task(void *arg) {
     ESP_LOGI("TEST_ID", "Iniciando: avanza si hay ID, para si no hay");
     ESP_LOGI("TEST_ID", "Esperando datos de CamID por UART_NUM_%d (RX=GPIO%d)",
              (int)UART_ID_PORT, UART_ID_RX);
 
-    uint8_t  prev       = 0;
+    uint8_t  prev       = 0xFF;
     uint32_t tick_count = 0;
 
     while (1) {
-        /* Monitor periódico cada 500 ms */
+        uint8_t det = g_id_detected;
+
         if (tick_count % 50 == 0) {
             ESP_LOGI("TEST_ID", "MONITOR | g_id_detected=%d | motor=%s",
-                     g_id_detected,
-                     g_id_detected ? "ADELANTE" : "DETENIDO");
+                     det, det ? "ADELANTE" : "DETENIDO");
         }
         tick_count++;
 
-        if (g_id_detected) {
-            if (!prev) {
-                prev = 1;
-                ESP_LOGI("TEST_ID", "ID detectado → adelante (duty=%d)", DUTY_DETECTED_FWD);
-            }
+        if (det != prev) {
+            ESP_LOGI("TEST_ID", "ID %s", det ? "DETECTADO -> adelante" : "PERDIDO -> detenido");
+            prev = det;
+        }
+
+        if (det) {
             motor_forward(DUTY_DETECTED_FWD, DUTY_DETECTED_FWD);
         } else {
-            if (prev) {
-                prev = 0;
-                ESP_LOGI("TEST_ID", "Sin ID → detenido");
-            }
             motor_stop();
         }
         vTaskDelay(pdMS_TO_TICKS(10));

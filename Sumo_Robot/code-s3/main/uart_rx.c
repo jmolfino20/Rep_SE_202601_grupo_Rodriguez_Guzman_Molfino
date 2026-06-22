@@ -102,10 +102,14 @@ void uart_id_task(void *arg) {
                 ESP_LOGI("UART_ID", "comunicacion restablecida tras %u timeouts", timeouts);
                 timeouts = 0;
             }
-            g_id_detected = byte;
+            /* Binario: 0=Sin ID, 1=Con ID. 0xFF=error → tratar como sin ID. */
+            g_id_detected = (byte == 1) ? 1 : 0;
             if (byte != prev) {
-                ESP_LOGI("UART_ID", "rx=0x%02X -> ID=%s",
-                         byte, byte ? "DETECTADO" : "libre");
+                if (byte == 0xFF)
+                    ESP_LOGW("UART_ID", "rx=0xFF (inferencia invalida) -> sin ID");
+                else
+                    ESP_LOGI("UART_ID", "rx=%d -> %s",
+                             byte, byte ? "CON ID" : "SIN ID");
                 prev = byte;
             }
         } else {
