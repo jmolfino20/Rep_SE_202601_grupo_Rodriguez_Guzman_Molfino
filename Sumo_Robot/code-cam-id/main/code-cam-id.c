@@ -10,6 +10,10 @@
 
 #define TAG "CAM_ID"
 
+/* Sentinel UART: indica "sin lectura valida" (error de inferencia o tamano
+ * de frame incorrecto). Las clases reales van de 0 a 3. */
+#define CLASS_INVALID 0xFF
+
 static QueueHandle_t g_queue;   /* mailbox de 1 byte entre los dos cores */
 
 static void camera_init(void) {
@@ -28,12 +32,12 @@ static void camera_init(void) {
         .pin_pclk     = CAM_PIN_PCLK,
         .xclk_freq_hz = 20000000,
         .pixel_format = PIXFORMAT_GRAYSCALE,
-        .frame_size   = FRAMESIZE_96X96,
+        .frame_size   = FRAMESIZE_QVGA,
         .fb_count     = 1,
         .fb_location  = CAMERA_FB_IN_DRAM,
     };
     ESP_ERROR_CHECK(esp_camera_init(&cfg));
-    ESP_LOGI(TAG, "camara inicializada OK (%dx%d, escala de grises)", IMG_WIDTH, IMG_HEIGHT);
+    ESP_LOGI(TAG, "camara inicializada OK (QVGA %dx%d, escala de grises)", CAM_WIDTH, CAM_HEIGHT);
 }
 
 static void uart_init(void) {
@@ -61,15 +65,17 @@ static void id_detect_task(void *arg) {
     while (1) {
         camera_fb_t *fb = esp_camera_fb_get();
         if (fb) {
-            uint8_t result = ml_id_detect(fb->buf, fb->width, fb->height) ? 1 : 0;
+            int class_id = ml_id_detect(fb->buf, fb->width, fb->height);
             esp_camera_fb_return(fb);
+
+            uint8_t result = (class_id >= 0) ? (uint8_t)class_id : CLASS_INVALID;
             xQueueOverwrite(g_queue, &result);
             frames++;
 
             /* Heartbeat cada 100 frames (~5 s a 50 ms/frame) */
             if (frames % 100 == 0) {
-                ESP_LOGI(TAG, "MONITOR | frames=%u  fb_errors=%u  ultimo_resultado=%d",
-                         frames, fb_errors, result);
+                ESP_LOGI(TAG, "MONITOR | frames=%u  fb_errors=%u  ultima_clase=%d",
+                         frames, fb_errors, class_id);
             }
         } else {
             fb_errors++;
@@ -81,8 +87,8 @@ static void id_detect_task(void *arg) {
 
 /* Core 1: envía el último resultado por UART al S3 */
 static void uart_send_task(void *arg) {
-    uint8_t val  = 0;
-    uint8_t prev = 0xFF;
+    uint8_t val  = CLASS_INVALID;
+    uint8_t prev = CLASS_INVALID;
 
     ESP_LOGI(TAG, "uart_send_task iniciada");
 
@@ -92,11 +98,14 @@ static void uart_send_task(void *arg) {
 
             /* Loguear solo en cambio de valor */
             if (val != prev) {
-                ESP_LOGI(TAG, "UART tx=0x%02X (ID=%s)", val, val ? "DETECTADO" : "libre");
+                if (val == CLASS_INVALID)
+                    ESP_LOGI(TAG, "UART tx=0x%02X (sin lectura valida)", val);
+                else
+                    ESP_LOGI(TAG, "UART tx=0x%02X (clase=%u)", val, val);
                 prev = val;
             }
         }
-        /* Sin este delay la task loopea a velocidad máxima, llenando el buffer
+        /* Sin este delay la task loopea a velocidad maxima, llenando el buffer
          * UART del S3 a 11520 bytes/s con el mismo byte repetido. */
         vTaskDelay(pdMS_TO_TICKS(DETECT_PERIOD_MS));
     }
@@ -105,8 +114,10 @@ static void uart_send_task(void *arg) {
 void app_main(void) {
     ESP_LOGI(TAG, "=== CamID iniciando ===");
     camera_init();
-    ml_id_init();   /* antes de uart_init: los logs del modelo aparecen en consola */
-    uart_init();    /* remapea GPIO1/GPIO3 de UART0 a UART1 -- consola se pierde aqui */
+    ml_id_init();
+    ESP_LOGI(TAG, "Init completo. Remapeando UART — consola se pierde despues de esto.");
+    vTaskDelay(pdMS_TO_TICKS(100));  /* dejar que el log flush antes de perder la consola */
+    uart_init();
 
     g_queue = xQueueCreate(1, sizeof(uint8_t));
 

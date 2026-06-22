@@ -36,7 +36,7 @@
 #define BUTTON_PIN   2
 
 /* ── State-machine timing (ms) ──────────────────────────────────── */
-#define IDLE_FWD_MS              4000
+#define IDLE_FWD_MS              1500
 #define IDLE_TURN_MS              200
 #define ATTACK_FWD_MS             400
 #define ATTACK_BACK_MS            500

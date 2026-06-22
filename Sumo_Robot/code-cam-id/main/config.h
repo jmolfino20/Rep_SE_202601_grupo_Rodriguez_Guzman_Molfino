@@ -25,10 +25,10 @@
 #define UART_RX_PIN      3
 #define UART_BAUD       115200
 
-/* ML inference parameters */
-#define IMG_WIDTH       96
-#define IMG_HEIGHT      96
-#define ID_THRESHOLD    0.5f
+/* Captura QVGA (320x240), luego crop+resize a 128x128 en preprocesamiento */
+#define CAM_WIDTH       320
+#define CAM_HEIGHT      240
+#define MODEL_INPUT     128
 
 /* Frame capture period (ms) */
 #define DETECT_PERIOD_MS  50

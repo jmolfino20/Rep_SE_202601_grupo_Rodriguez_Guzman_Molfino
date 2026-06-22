@@ -1,5 +1,6 @@
-// Auto-generado por id_detector_curriculum.ipynb. No editar manualmente.
-// Modelo TFLite INT8 — id_detector — 17240 bytes (16.8 KB)
+// Auto-generado desde Extra_1/models/id_detector_int8.tflite. No editar manualmente.
+// Modelo TFLite INT8 — id_detector binario — 17240 bytes (16.8 KB)
+// Input: 1x128x128x1 INT8 | Output: 1x2 INT8 (softmax, 2 clases: Sin ID / Con ID)
 #pragma once
 #include <stdint.h>
 

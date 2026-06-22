@@ -106,8 +106,8 @@ void audio_task(void *arg) {
                      pp, magnitude);
         }
 
-        /* ── Accionar motor ────────────────────────────────────────── */
-        if (dir != DIR_NONE) {
+        /* ── Accionar motor (borde tiene prioridad) ─────────────────── */
+        if (dir != DIR_NONE && !g_border_detected) {
             if (dir != prev_dir) {
                 ESP_LOGW(TAG, "INT AUDIO: nueva direccion -> %s", dir_name(dir));
             }
@@ -121,7 +121,8 @@ void audio_task(void *arg) {
             }
         } else {
             if (g_audio_override) {
-                ESP_LOGW(TAG, "INT AUDIO: sin nota -> motor libre");
+                ESP_LOGW(TAG, "INT AUDIO: %s -> motor libre",
+                         g_border_detected ? "borde prioridad" : "sin nota");
                 motor_stop();
             }
             g_audio_override = 0;
