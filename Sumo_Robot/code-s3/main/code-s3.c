@@ -41,8 +41,8 @@ void app_main(void) {
 
 #if ROBOT_MODE == MODE_AUDIO
     /* ── Prueba micrófono ────────────────────────────────────────────
-     * Solo audio_task corre. Las notas 490/700/900/1100 Hz mueven el
-     * robot. Ver logs "AUDIO" en monitor serie. */
+     * Solo audio_task corre. Tonos DTMF (teclas 1/4/6/9/3) mueven
+     * el robot. Ver logs "AUDIO" en monitor serie. */
     ESP_LOGI(TAG, "=== Modo: AUDIO (prueba micrófono) ===");
     xTaskCreatePinnedToCore(audio_task, "audio", 8192, NULL, 5, NULL, 1);
 

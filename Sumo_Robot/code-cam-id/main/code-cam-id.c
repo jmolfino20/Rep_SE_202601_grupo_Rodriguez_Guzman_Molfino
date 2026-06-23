@@ -72,10 +72,12 @@ static void id_detect_task(void *arg) {
             xQueueOverwrite(g_queue, &result);
             frames++;
 
-            /* Heartbeat cada 100 frames (~5 s a 50 ms/frame) */
-            if (frames % 100 == 0) {
-                ESP_LOGI(TAG, "MONITOR | frames=%u  fb_errors=%u  ultima_clase=%d",
-                         frames, fb_errors, class_id);
+            if (class_id == 1) {
+                ESP_LOGW(TAG, ">>> ID DETECTADO  (clase=%d, frame=%u)", class_id, frames);
+            } else if (class_id == 0) {
+                ESP_LOGI(TAG, "    sin ID        (clase=%d, frame=%u)", class_id, frames);
+            } else {
+                ESP_LOGE(TAG, "    error ML      (ret=%d, frame=%u)", class_id, frames);
             }
         } else {
             fb_errors++;
