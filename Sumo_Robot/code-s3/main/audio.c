@@ -16,7 +16,6 @@
 typedef enum {
     DIR_NONE,
     DIR_BACK,
-    DIR_LEFT,
     DIR_RIGHT,
     DIR_ATTACK,
 } AudioDir;
@@ -24,7 +23,6 @@ typedef enum {
 static const char *dir_name(AudioDir d) {
     switch (d) {
         case DIR_BACK:   return "ATRAS";
-        case DIR_LEFT:   return "IZQUIERDA";
         case DIR_RIGHT:  return "DERECHA";
         case DIR_ATTACK: return "ATAQUE";
         default:         return "sin nota";
@@ -80,7 +78,6 @@ static AudioDir classify_dtmf(float fa, float fb) {
 
     if (near_freq(lo, AUDIO_A_F1) && near_freq(hi, AUDIO_A_F2)) return DIR_ATTACK;
     if (near_freq(lo, AUDIO_6_F1) && near_freq(hi, AUDIO_6_F2)) return DIR_RIGHT;
-    if (near_freq(lo, AUDIO_4_F1) && near_freq(hi, AUDIO_4_F2)) return DIR_LEFT;
     if (near_freq(lo, AUDIO_9_F1) && near_freq(hi, AUDIO_9_F2)) return DIR_BACK;
 
     return DIR_NONE;
@@ -103,15 +100,15 @@ void audio_task(void *arg) {
     ESP_LOGI(TAG, "FS calibrada: %.1f Hz  |  resolucion FFT: %.2f Hz/bin", real_fs, bin_hz);
     ESP_LOGI(TAG, "Tolerancia: +/- %.0f Hz  |  confirmacion: %d de %d frames",
              AUDIO_TOLERANCE, AUDIO_CONFIRM_NEEDED, AUDIO_CONFIRM_WINDOW);
-    ESP_LOGI(TAG, "DTMF: ATK=%.0f+%.0f  DER=%.0f+%.0f  IZQ=%.0f+%.0f  BACK=%.0f+%.0f",
+    ESP_LOGI(TAG, "DTMF: ATK=%.0f+%.0f  DER=%.0f+%.0f  BACK=%.0f+%.0f",
              AUDIO_A_F1, AUDIO_A_F2,
              AUDIO_6_F1, AUDIO_6_F2,
-             AUDIO_4_F1, AUDIO_4_F2,
              AUDIO_9_F1, AUDIO_9_F2);
 
     AudioDir stable_dir   = DIR_NONE;
     AudioDir history[AUDIO_CONFIRM_WINDOW];
     int hist_idx = 0;
+    int silence_count = 0;
     for (int i = 0; i < AUDIO_CONFIRM_WINDOW; i++) history[i] = DIR_NONE;
 
     while (1) {
@@ -157,22 +154,22 @@ void audio_task(void *arg) {
                      pp, f_row, mag_row, f_col, mag_col);
         }
 
-        if (stable_dir != DIR_NONE && !g_border_detected) {
+        if (stable_dir != DIR_NONE) {
+            silence_count = 0;
             g_audio_override = 1;
             switch (stable_dir) {
                 case DIR_BACK:   motor_backward(DUTY_DETECTED_FWD, DUTY_DETECTED_FWD); break;
-                case DIR_LEFT:   motor_left    (DUTY_TURN,         DUTY_TURN);          break;
                 case DIR_RIGHT:  motor_right   (DUTY_TURN,         DUTY_TURN);          break;
                 case DIR_ATTACK: motor_forward (DUTY_ATTACK_FWD,   DUTY_ATTACK_FWD);    break;
                 default: break;
             }
         } else {
-            if (g_audio_override) {
-                ESP_LOGW(TAG, "INT AUDIO: %s -> motor libre",
-                         g_border_detected ? "borde prioridad" : "sin nota");
+            silence_count++;
+            if (g_audio_override && silence_count >= AUDIO_SILENCE_COUNT) {
+                ESP_LOGW(TAG, "INT AUDIO: %d frames sin nota -> motor libre", silence_count);
                 motor_stop();
+                g_audio_override = 0;
             }
-            g_audio_override = 0;
         }
 
         vTaskDelay(1);

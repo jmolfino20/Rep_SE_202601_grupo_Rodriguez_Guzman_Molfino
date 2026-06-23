@@ -154,7 +154,13 @@ void state_machine_task(void *arg) {
     change_state(STATE_IDLE);
 
     while (1) {
-        /* ── Prioridad 1: Borde (siempre, incluso durante ATTACK) ── */
+        /* ── Prioridad 1: Audio override (siempre obedece) ── */
+        if (g_audio_override) {
+            vTaskDelay(pdMS_TO_TICKS(TICK_MS));
+            continue;
+        }
+
+        /* ── Prioridad 2: Borde (siempre, incluso durante ATTACK) ── */
         if (g_border_detected) {
             if (state != STATE_BORDER) {
                 ESP_LOGW(TAG, "BORDE detectado (desde %s)", state_name(state));
@@ -169,12 +175,6 @@ void state_machine_task(void *arg) {
         if (state == STATE_BORDER) {
             ESP_LOGW(TAG, "BORDE despejado -> IDLE");
             change_state(STATE_IDLE);
-        }
-
-        /* ── Prioridad 2: Audio override ── */
-        if (g_audio_override) {
-            vTaskDelay(pdMS_TO_TICKS(TICK_MS));
-            continue;
         }
 
         /* ── Máquina de estados ── */

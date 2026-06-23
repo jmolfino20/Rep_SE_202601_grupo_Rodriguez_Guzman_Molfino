@@ -57,28 +57,25 @@
 /* ── Audio DTMF — comandos por par de frecuencias ───────────────────
  *
  *  Comando     F1 (fila)   F2 (columna)
- *  ATAQUE      697 Hz      1336 Hz
+ *  ATAQUE      852 Hz      1209 Hz
  *  DERECHA     770 Hz      1633 Hz
- *  IZQUIERDA   852 Hz      1209 Hz
  *  ATRÁS       941 Hz      1477 Hz
  * ─────────────────────────────────────────────────────────────────*/
-#define AUDIO_TOLERANCE     100.0f   /* ± Hz aceptado por banda */
+#define AUDIO_TOLERANCE     50.0f   /* ± Hz aceptado por banda */
 
-#define AUDIO_A_F1   697.0f         /* ATAQUE     */
-#define AUDIO_A_F2  1836.0f
+#define AUDIO_A_F1   852.0f         /* ATAQUE     */
+#define AUDIO_A_F2  1209.0f
 
 #define AUDIO_6_F1   770.0f         /* DERECHA    */
 #define AUDIO_6_F2  1633.0f
 
-#define AUDIO_4_F1   852.0f         /* IZQUIERDA  */
-#define AUDIO_4_F2  1209.0f
-
 #define AUDIO_9_F1   941.0f         /* ATRÁS      */
 #define AUDIO_9_F2  1477.0f
  
-#define AUDIO_MIN_MAGNITUDE     0.35f       /* filtra ruido (~0.1-0.28) vs señal real (~0.5+) */
+#define AUDIO_MIN_MAGNITUDE     0.20f       /* filtra ruido (~0.1-0.28) vs señal real (~0.5+) */
 #define AUDIO_CONFIRM_WINDOW    3           /* ventana de frames para evaluar */
-#define AUDIO_CONFIRM_NEEDED    2          /* cuantos de la ventana deben coincidir */
+#define AUDIO_CONFIRM_NEEDED    1           /* cuantos de la ventana deben coincidir */
+#define AUDIO_SILENCE_COUNT     3           /* mediciones sin nota para soltar audio override */
 
 // /* ── Audio note → command frequency bands (Hz) ──────────────────── */
 // #define AUDIO_FWD_LO     490.0f
