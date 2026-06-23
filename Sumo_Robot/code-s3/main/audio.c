@@ -15,7 +15,6 @@
 
 typedef enum {
     DIR_NONE,
-    DIR_FWD,
     DIR_BACK,
     DIR_LEFT,
     DIR_RIGHT,
@@ -24,7 +23,6 @@ typedef enum {
 
 static const char *dir_name(AudioDir d) {
     switch (d) {
-        case DIR_FWD:    return "ADELANTE";
         case DIR_BACK:   return "ATRAS";
         case DIR_LEFT:   return "IZQUIERDA";
         case DIR_RIGHT:  return "DERECHA";
@@ -68,7 +66,7 @@ static float fft_peak_in_band(const float *spectrum, float real_fs,
 }
 
 #define DTMF_ROW_LO   650.0f
-#define DTMF_ROW_HI   900.0f
+#define DTMF_ROW_HI  1000.0f
 #define DTMF_COL_LO  1150.0f
 #define DTMF_COL_HI  1700.0f
 
@@ -80,11 +78,10 @@ static AudioDir classify_dtmf(float fa, float fb) {
     float lo = fa < fb ? fa : fb;
     float hi = fa < fb ? fb : fa;
 
-    if (near_freq(lo, AUDIO_1_F1) && near_freq(hi, AUDIO_1_F2)) return DIR_FWD;
-    if (near_freq(lo, AUDIO_4_F1) && near_freq(hi, AUDIO_4_F2)) return DIR_LEFT;
-    if (near_freq(lo, AUDIO_6_F1) && near_freq(hi, AUDIO_6_F2)) return DIR_RIGHT;
-    if (near_freq(lo, AUDIO_9_F1) && near_freq(hi, AUDIO_9_F2)) return DIR_BACK;
     if (near_freq(lo, AUDIO_A_F1) && near_freq(hi, AUDIO_A_F2)) return DIR_ATTACK;
+    if (near_freq(lo, AUDIO_6_F1) && near_freq(hi, AUDIO_6_F2)) return DIR_RIGHT;
+    if (near_freq(lo, AUDIO_4_F1) && near_freq(hi, AUDIO_4_F2)) return DIR_LEFT;
+    if (near_freq(lo, AUDIO_9_F1) && near_freq(hi, AUDIO_9_F2)) return DIR_BACK;
 
     return DIR_NONE;
 }
@@ -106,12 +103,11 @@ void audio_task(void *arg) {
     ESP_LOGI(TAG, "FS calibrada: %.1f Hz  |  resolucion FFT: %.2f Hz/bin", real_fs, bin_hz);
     ESP_LOGI(TAG, "Tolerancia: +/- %.0f Hz  |  confirmacion: %d de %d frames",
              AUDIO_TOLERANCE, AUDIO_CONFIRM_NEEDED, AUDIO_CONFIRM_WINDOW);
-    ESP_LOGI(TAG, "DTMF: FWD=%.0f+%.0f  BACK=%.0f+%.0f  IZQ=%.0f+%.0f  DER=%.0f+%.0f  ATK=%.0f+%.0f",
-             AUDIO_1_F1, AUDIO_1_F2,
-             AUDIO_9_F1, AUDIO_9_F2,
-             AUDIO_4_F1, AUDIO_4_F2,
+    ESP_LOGI(TAG, "DTMF: ATK=%.0f+%.0f  DER=%.0f+%.0f  IZQ=%.0f+%.0f  BACK=%.0f+%.0f",
+             AUDIO_A_F1, AUDIO_A_F2,
              AUDIO_6_F1, AUDIO_6_F2,
-             AUDIO_A_F1, AUDIO_A_F2);
+             AUDIO_4_F1, AUDIO_4_F2,
+             AUDIO_9_F1, AUDIO_9_F2);
 
     AudioDir stable_dir   = DIR_NONE;
     AudioDir history[AUDIO_CONFIRM_WINDOW];
@@ -138,7 +134,7 @@ void audio_task(void *arg) {
         hist_idx = (hist_idx + 1) % AUDIO_CONFIRM_WINDOW;
 
         AudioDir detected = DIR_NONE;
-        for (int d = DIR_FWD; d <= DIR_ATTACK; d++) {
+        for (int d = DIR_BACK; d <= DIR_ATTACK; d++) {
             int count = 0;
             for (int i = 0; i < AUDIO_CONFIRM_WINDOW; i++) {
                 if (history[i] == (AudioDir)d) count++;
@@ -164,7 +160,6 @@ void audio_task(void *arg) {
         if (stable_dir != DIR_NONE && !g_border_detected) {
             g_audio_override = 1;
             switch (stable_dir) {
-                case DIR_FWD:    motor_forward (DUTY_DETECTED_FWD, DUTY_DETECTED_FWD); break;
                 case DIR_BACK:   motor_backward(DUTY_DETECTED_FWD, DUTY_DETECTED_FWD); break;
                 case DIR_LEFT:   motor_left    (DUTY_TURN,         DUTY_TURN);          break;
                 case DIR_RIGHT:  motor_right   (DUTY_TURN,         DUTY_TURN);          break;
